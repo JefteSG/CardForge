@@ -2,6 +2,7 @@ import initSqlJs, { type Database, type SqlJsStatic } from "sql.js"
 
 let SQL: SqlJsStatic | null = null
 let db: Database | null = null
+let initializationPromise: Promise<void> | null = null
 
 const STORAGE_KEY = "cardforge_sqlite_db"
 
@@ -20,38 +21,59 @@ function toBase64(bytes: Uint8Array): string {
 }
 
 export async function initDB() {
-  if (!SQL) {
-    SQL = await initSqlJs({
-      locateFile: (file) => {
-        if (file.endsWith(".wasm")) {
-          return "/sql-wasm.wasm"
-        }
-        return file
-      },
-    })
+  // Prevent multiple simultaneous initialization attempts
+  if (initializationPromise) {
+    return initializationPromise
   }
+
+  initializationPromise = initializeDatabase()
+  return initializationPromise
+}
+
+async function initializeDatabase() {
+  if (!SQL) {
+    try {
+      SQL = await initSqlJs({
+        locateFile: (file) => {
+          if (file.endsWith(".wasm")) {
+            return "/sql-wasm.wasm"
+          }
+          return file
+        },
+      })
+    } catch (error) {
+      console.error("Failed to initialize sql.js:", error)
+      throw new Error("SQLite WebAssembly module failed to load. Please refresh the page.")
+    }
+  }
+  
   if (!db) {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      db = new SQL!.Database(toUint8Array(saved))
-    } else {
-      db = new SQL!.Database()
-      db.run(`
-        CREATE TABLE IF NOT EXISTS cards (
-          id TEXT PRIMARY KEY,
-          title TEXT NOT NULL,
-          description TEXT,
-          rarity TEXT,
-          type TEXT,
-          collection TEXT,
-          imageUrl TEXT,
-          imagePrompt TEXT,
-          variant TEXT,
-          createdAt TEXT,
-          updatedAt TEXT
-        );
-      `)
-      persist()
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY)
+      if (saved) {
+        db = new SQL!.Database(toUint8Array(saved))
+      } else {
+        db = new SQL!.Database()
+        db.run(`
+          CREATE TABLE IF NOT EXISTS cards (
+            id TEXT PRIMARY KEY,
+            title TEXT NOT NULL,
+            description TEXT,
+            rarity TEXT,
+            type TEXT,
+            collection TEXT,
+            imageUrl TEXT,
+            imagePrompt TEXT,
+            variant TEXT,
+            createdAt TEXT,
+            updatedAt TEXT
+          );
+        `)
+        persist()
+      }
+    } catch (error) {
+      console.error("Failed to create database:", error)
+      throw new Error("Failed to initialize SQLite database")
     }
   }
 }
