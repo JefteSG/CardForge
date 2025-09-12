@@ -1,0 +1,41 @@
+-- CardForge SQLite Database Schema
+-- Arquivo de banco de dados SQLite para persistência local
+
+-- Tabela principal de cartas
+CREATE TABLE IF NOT EXISTS cards (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  rarity TEXT CHECK (rarity IN ('common', 'rare', 'epic', 'legendary', 'mythic')),
+  type TEXT CHECK (type IN ('creature', 'spell', 'artifact', 'enchantment')),
+  collection TEXT,
+  imageUrl TEXT,
+  imagePrompt TEXT,
+  variant TEXT CHECK (variant IN ('normal', 'shiny', 'holographic', 'first-edition')),
+  createdAt TEXT NOT NULL,
+  updatedAt TEXT
+);
+
+-- Índices para performance
+CREATE INDEX IF NOT EXISTS idx_cards_rarity ON cards(rarity);
+CREATE INDEX IF NOT EXISTS idx_cards_type ON cards(type);
+CREATE INDEX IF NOT EXISTS idx_cards_collection ON cards(collection);
+CREATE INDEX IF NOT EXISTS idx_cards_created_at ON cards(createdAt);
+
+-- Dados de exemplo (opcional)
+INSERT OR IGNORE INTO cards (
+  id, title, description, rarity, type, collection, 
+  imageUrl, imagePrompt, variant, createdAt, updatedAt
+) VALUES (
+  'sample-card-1',
+  'Dragão de Fogo',
+  'Uma criatura poderosa que domina as chamas eternas.',
+  'legendary',
+  'creature',
+  'Elementos Primordiais',
+  'https://source.unsplash.com/1024x1024/?dragon,fire',
+  'majestic fire dragon breathing flames',
+  'normal',
+  datetime('now'),
+  datetime('now')
+);
