@@ -14,7 +14,9 @@ CardForge é uma aplicação web MVP inovadora para criação de cartas de jogo 
 - **📊 Analytics**: Estatísticas em tempo real da coleção
 - **📁 Sistema de Exportação**: PNG, PDF e JSON formats
 - **💾 Persistência Local**: SQLite no navegador para funcionamento offline-first
+  
 
+  
 ## 🛠️ Stack Tecnológica
 
 ### Frontend
