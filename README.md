@@ -27,7 +27,7 @@ CardForge é uma aplicação web MVP inovadora para criação de cartas de jogo 
 - **Motion** - Animações fluidas
 
 ### Backend & Persistência
-- **SQLite** - Banco de dados local (browser + servidor)
+- **SQLite** - Banco de dados local (b rowser + servidor)
 - **sql.js** - SQLite compilado para WebAssembly
 - **Hono** - Framework web rápido para API local
 - **Vite** - Build tool e dev server
